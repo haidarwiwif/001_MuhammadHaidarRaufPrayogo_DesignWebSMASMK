@@ -378,6 +378,50 @@ document.addEventListener("DOMContentLoaded", () => {
     return Array.isArray(parsed) ? parsed : [];
   }
 
+  function buildDefaultActivities() {
+    const now = new Date();
+    const plusHours = (hours) => new Date(now.getTime() + hours * 60 * 60 * 1000);
+    const toInputDateTime = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hour = String(date.getHours()).padStart(2, "0");
+      const minute = String(date.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day}T${hour}:${minute}`;
+    };
+
+    return [
+      {
+        id: "act_dummy_1",
+        title: "Bersih Pantai Komunitas",
+        datetime: toInputDateTime(plusHours(24)),
+        what: "Aksi bersih pantai dan pemilahan sampah bersama warga setempat.",
+        where: "Sekitar Denpasar",
+        whereCoords: { lat: -8.6705, lng: 115.2126, label: "Sekitar Denpasar" },
+        creator: "Komunitas Hijau Bali",
+        participants: 12,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "act_dummy_2",
+        title: "Tanam Pohon Akhir Pekan",
+        datetime: toInputDateTime(plusHours(48)),
+        what: "Penanaman bibit pohon di ruang terbuka untuk menambah area hijau kota.",
+        where: "Sekitar Jakarta",
+        whereCoords: { lat: -6.2088, lng: 106.8456, label: "Sekitar Jakarta" },
+        creator: "Gerakan Warga Urban",
+        participants: 18,
+        createdAt: new Date().toISOString(),
+      },
+    ];
+  }
+
+  function ensureDefaultActivities() {
+    const current = loadActivities();
+    if (current.length > 0) return;
+    saveActivities(buildDefaultActivities());
+  }
+
   function saveActivities(activities) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
   }
@@ -489,13 +533,13 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="activity-chip ${chipClass}">${chipLabel}</span>
             </div>
             <div class="activity-time">
-              <i class="fas fa-calendar-alt" size="14"></i>
+              <i class="fa-solid fa-calendar-alt" size="14"></i>
               ${formatDateTime(item.datetime)}
             </div>
             <p class="activity-body">${item.what}</p>
             <div class="activity-meta">
-              <span><i class="fas fa-map-marker-alt" size="14"></i>${item.where}</span>
-              <span><i class="fas fa-user" size="14"></i>Penggagas: ${item.creator || "Warga"}</span>
+              <span><i class="fa-solid fa-map-marker-alt" size="14"></i>${item.where}</span>
+              <span><i class="fa-solid fa-user" size="14"></i>Penggagas: ${item.creator || "Warga"}</span>
             </div>
             <div class="activity-footer">
               <div class="participant-count">${item.participants || 0} peserta</div>
@@ -626,6 +670,7 @@ document.addEventListener("DOMContentLoaded", () => {
   openFormBtn?.addEventListener("click", showForm);
   closeFormBtn?.addEventListener("click", hideForm);
 
+  ensureDefaultActivities();
   updateMapLocationDisplay();
   renderActivities();
 });

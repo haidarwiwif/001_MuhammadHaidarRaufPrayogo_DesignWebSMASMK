@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <p class="article-excerpt">Klik untuk membaca artikel selengkapnya tentang ${art.title} yang bersumber dari ensiklopedia bebas.</p>
                         <div class="article-footer">
                             <span>${art.author} • ${art.date}</span>
-                            <button class="bookmark-btn"><i class="fas fa-bookmark" size="16"></i></button>
+                            <button class="bookmark-btn"><i class="fa-solid fa-bookmark" size="16"></i></button>
                         </div>
                     </div>
                 </a>
@@ -235,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
     shareFactBtn.addEventListener("click", () => {
       navigator.clipboard.writeText(randomFact).then(() => {
         const originalText = shareFactBtn.innerHTML;
-        shareFactBtn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+        shareFactBtn.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin!';
         setTimeout(() => {
           shareFactBtn.innerHTML = originalText;
         }, 2000);

@@ -159,6 +159,10 @@
   margin-top: 10px;
 }
 
+.community-action-map .fallback-map-title {
+  display: none;
+}
+
 .fallback-map-ui {
   position: relative;
   overflow: hidden;
@@ -922,6 +926,10 @@
 
   .dashboard-grid .mobile-more-item {
     display: none;
+  }
+
+  .dashboard-grid .action-map-widget.mobile-more-item {
+    display: block;
   }
 
   .dashboard-grid .dashboard-more-toggle[open] ~ .mobile-more-item {

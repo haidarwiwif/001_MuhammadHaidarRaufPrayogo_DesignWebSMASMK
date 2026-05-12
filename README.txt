@@ -1,0 +1,1 @@
+Aset visual utama menggunakan CDN/external source sesuai aturan. Jadi tidak asset sama sekali terimakasih.

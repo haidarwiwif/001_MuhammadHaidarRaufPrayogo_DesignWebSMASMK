@@ -180,6 +180,41 @@ document.addEventListener("DOMContentLoaded", () => {
     return Math.max(2, Math.min(98, value));
   }
 
+  function latLngToCommunityPercentFallback(point) {
+    const anchors = [
+      { lat: 3.5952, lng: 98.6722, left: 17, top: 31 }, // Medan
+      { lat: -2.9909, lng: 104.7567, left: 24, top: 49 }, // Palembang
+      { lat: -6.2088, lng: 106.8456, left: 31, top: 64 }, // Jakarta
+      { lat: -6.9175, lng: 107.6191, left: 35, top: 65 }, // Bandung
+      { lat: -6.9667, lng: 110.4167, left: 52, top: 66 }, // Semarang
+      { lat: -7.2575, lng: 112.7521, left: 63, top: 68 }, // Surabaya
+      { lat: -8.6705, lng: 115.2126, left: 71, top: 69 }, // Denpasar
+      { lat: -0.0263, lng: 109.3425, left: 52, top: 40 }, // Pontianak
+      { lat: -3.3186, lng: 114.5944, left: 59, top: 49 }, // Banjarmasin
+      { lat: -1.2379, lng: 116.8529, left: 61, top: 43 }, // Balikpapan
+      { lat: -0.5022, lng: 117.1537, left: 62, top: 41 }, // Samarinda
+      { lat: -5.1477, lng: 119.4328, left: 73, top: 53 }, // Makassar
+      { lat: 1.4748, lng: 124.8421, left: 80, top: 35 }, // Manado
+      { lat: -3.7, lng: 128.2, left: 82, top: 53 }, // Ambon approx
+      { lat: -2.5337, lng: 140.7181, left: 93, top: 53 }, // Jayapura
+    ];
+
+    let nearest = anchors[0];
+    let minDistance = Infinity;
+    for (const anchor of anchors) {
+      const dist = haversineDistanceKm(point, { lat: anchor.lat, lng: anchor.lng });
+      if (dist < minDistance) {
+        minDistance = dist;
+        nearest = anchor;
+      }
+    }
+
+    return {
+      left: clampPercent(nearest.left),
+      top: clampPercent(nearest.top),
+    };
+  }
+
   function provinceFromPoint(point) {
     if (point && typeof point.provinceHint === "string" && point.provinceHint) {
       return point.provinceHint;
@@ -256,6 +291,50 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (_) {
       return fallback;
     }
+  }
+
+  function buildDefaultCommunityActivities() {
+    const now = new Date();
+    const plusHours = (hours) => new Date(now.getTime() + hours * 60 * 60 * 1000);
+    const toInputDateTime = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hour = String(date.getHours()).padStart(2, "0");
+      const minute = String(date.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day}T${hour}:${minute}`;
+    };
+
+    return [
+      {
+        id: "act_dummy_1",
+        title: "Bersih Pantai Komunitas",
+        datetime: toInputDateTime(plusHours(24)),
+        what: "Aksi bersih pantai dan pemilahan sampah bersama warga setempat.",
+        where: "Sekitar Denpasar",
+        whereCoords: { lat: -8.6705, lng: 115.2126, label: "Sekitar Denpasar" },
+        creator: "Komunitas Hijau Bali",
+        participants: 12,
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: "act_dummy_2",
+        title: "Tanam Pohon Akhir Pekan",
+        datetime: toInputDateTime(plusHours(48)),
+        what: "Penanaman bibit pohon di ruang terbuka untuk menambah area hijau kota.",
+        where: "Sekitar Jakarta",
+        whereCoords: { lat: -6.2088, lng: 106.8456, label: "Sekitar Jakarta" },
+        creator: "Gerakan Warga Urban",
+        participants: 18,
+        createdAt: new Date().toISOString(),
+      },
+    ];
+  }
+
+  function ensureDefaultCommunityActivities() {
+    const raw = safeParse(localStorage.getItem(COMMUNITY_ACTIVITIES_KEY), []);
+    if (Array.isArray(raw) && raw.length > 0) return;
+    localStorage.setItem(COMMUNITY_ACTIVITIES_KEY, JSON.stringify(buildDefaultCommunityActivities()));
   }
 
   function hydrateCaches() {
@@ -358,7 +437,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function makeExportSummary() {
+    const selectedRoute = mapState.from && mapState.to
+      ? `${formatPointLabel(mapState.from)} -> ${formatPointLabel(mapState.to)}`
+      : "-";
+
     return [
+      `Rute Dipilih: ${selectedRoute}`,
       `Jarak Rute: ${routeDistanceEl?.textContent || "0"} km`,
       `Estimasi Waktu: ${routeEtaEl?.textContent || "-"}`,
       `Emisi Pilihan: ${currentEmissionEl?.textContent || "0"} kg/minggu`,
@@ -370,16 +454,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function exportSummaryPng() {
     const lines = makeExportSummary();
+    const lineHeight = 58;
+    const topY = 245;
+    const bottomPadding = 72;
+    const framePadding = 52;
     const canvas = document.createElement("canvas");
     canvas.width = 1200;
-    canvas.height = 630;
+    canvas.height = Math.max(630, topY + lines.length * lineHeight + bottomPadding);
     const ctx = canvas.getContext("2d");
 
     ctx.fillStyle = "#f2f6ef";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "#b8c9b4";
     ctx.lineWidth = 2;
-    ctx.strokeRect(52, 52, 1096, 526);
+    ctx.strokeRect(
+      framePadding,
+      framePadding,
+      canvas.width - framePadding * 2,
+      canvas.height - framePadding * 2,
+    );
 
     ctx.fillStyle = "#1f2a1f";
     ctx.font = "700 44px Arial";
@@ -392,7 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillStyle = "#243024";
     ctx.font = "500 30px Arial";
     lines.forEach((line, idx) => {
-      ctx.fillText(line, 84, 245 + idx * 58);
+      ctx.fillText(line, 84, topY + idx * lineHeight);
     });
 
     const link = document.createElement("a");
@@ -670,9 +763,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cityCoord = CITIES[cityName] || CITIES.Jakarta;
     const cityPoint = { lat: cityCoord.lat, lng: cityCoord.lon };
+    const now = Date.now();
+    const isActivityActive = (value) => {
+      const dt = new Date(value);
+      const time = dt.getTime();
+      if (!Number.isFinite(time) || Number.isNaN(time)) return false;
+      return time + 2 * 60 * 60 * 1000 >= now;
+    };
 
     const normalized = raw
       .map((item) => {
+        if (!isActivityActive(item?.datetime)) return null;
+
         const lat = Number(item?.whereCoords?.lat);
         const lng = Number(item?.whereCoords?.lng);
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
@@ -703,10 +805,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!normalized.length) return [];
 
-    const nearby = normalized.filter((item) => item.distanceKm <= 70);
-    const picked = (nearby.length ? nearby : normalized)
+    const picked = normalized
       .sort((a, b) => a.distanceKm - b.distanceKm)
-      .slice(0, 8);
+      .slice(0, 100);
 
     return picked.map((item) => ({
       ...item,
@@ -742,18 +843,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!window.L) {
       const actions = getCommunityActivitiesForMap(cityName);
       if (!actions.length) {
-        communityActionMapEl.innerHTML =
-          '<div class="fallback-map-empty">Belum ada titik kegiatan warga.</div>';
+        communityActionMapEl.innerHTML = `
+          ${FALLBACK_MAP_BG}
+          <div class="fallback-map-layer"></div>
+          <div class="fallback-map-hint">Belum ada titik kegiatan warga.</div>
+        `;
+        communityActionMapEl.classList.add("fallback-map-ui");
         return;
       }
 
       const dotsHtml = actions
         .map((item, idx) => {
-          const posRaw = latLngToPercentFallback({ lat: item.lat, lng: item.lng });
-          const pos = {
-            left: clampPercent(posRaw.left),
-            top: clampPercent(posRaw.top),
-          };
+          const pos = latLngToCommunityPercentFallback({ lat: item.lat, lng: item.lng });
           return `<button type="button" class="fallback-map-point-btn" data-action-idx="${idx}" style="left:${pos.left}%;top:${pos.top}%;" aria-label="Detail ${item.title}"></button>`;
         })
         .join("");
@@ -1417,6 +1518,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   (async function init() {
+    ensureDefaultCommunityActivities();
     hydrateCaches();
     initMap();
     syncModeDetailsByViewport();

@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Scroll to Top
   const scrollTopBtn = document.createElement("button");
   scrollTopBtn.className = "scroll-top";
-  scrollTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+  scrollTopBtn.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
   document.body.appendChild(scrollTopBtn);
   window.addEventListener("scroll", () => {
     if (window.scrollY > 400) {
@@ -162,6 +162,7 @@ function initQuickStartCta() {
       <div class="quick-start-actions">
         <a class="btn btn-primary" href="index.html#mobility-sim">Mulai Hitung Karbon</a>
         <a class="btn btn-outline" href="kegiatan.html#create-form-card">Buat Kegiatan</a>
+        <a class="btn btn-outline" href="konten.html">Buka Pusat Edukasi</a>
       </div>
       <button type="button" class="quick-start-close" aria-label="Tutup">Tutup</button>
     </div>

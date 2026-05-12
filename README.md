@@ -53,9 +53,3 @@ python -m http.server 8080
 ```
 3. Buka browser:
 - `http://localhost:8080`
-
-## Catatan Pengumpulan (Sesuai TM)
-- Jika pakai GitHub, repository harus `Public`.
-- Sertakan file `README.md` (dokumen ini) saat pengumpulan via GitHub.
-- Saat pengumpulan via Google Drive, pastikan folder diatur `Anyone with the link` + `Viewer`.
-- Pastikan melampirkan dokumentasi screenshot tiap halaman (`File Dokumentasi.pdf`) sesuai ketentuan TM.
