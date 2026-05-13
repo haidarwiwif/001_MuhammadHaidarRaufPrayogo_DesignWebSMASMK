@@ -23,13 +23,8 @@ Eco Hub adalah website edukasi interaktif yang membantu pengguna memahami dampak
 - HTML5
 - CSS3
 - JavaScript (Vanilla)
-- Font Awesome 6.5.2 (sesuai ketentuan TM)
-- Google Fonts (diizinkan guidebook)
-
-Catatan implementasi:
-- Tidak menggunakan framework frontend (React/Vue/Angular/Tailwind/Bootstrap).
-- Tidak menggunakan Leaflet (sudah dihapus demi kepatuhan aturan library).
-- Peta berjalan dengan fallback native berbasis HTML/CSS/JS.
+- Font Awesome 6.5.2
+- Google Fonts
 
 ## Struktur Proyek
 - `index.html` : halaman utama + simulasi mobilitas + dashboard
@@ -40,10 +35,9 @@ Catatan implementasi:
 - `artikel.html` : artikel edukasi
 - `css/` : stylesheet global, komponen, dan per halaman
 - `js/` : logika interaktif frontend
-- `assets/` : aset ikon aplikasi
 
 ## Cara Menjalankan Proyek
-1. Jalankan server lokal dari root proyek:
+1. Jalankan local server:
 ```powershell
 python -m http.server 8080
 ```
