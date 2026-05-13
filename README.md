@@ -23,7 +23,7 @@ Eco Hub adalah website edukasi interaktif yang membantu pengguna memahami dampak
 - HTML5
 - CSS3
 - JavaScript (Vanilla)
-- Font Awesome 5.15.1 (diizinkan guidebook)
+- Font Awesome 6.5.2 (sesuai ketentuan TM)
 - Google Fonts (diizinkan guidebook)
 
 Catatan implementasi:
@@ -43,13 +43,9 @@ Catatan implementasi:
 - `assets/` : aset ikon aplikasi
 
 ## Cara Menjalankan Proyek
-1. Buka terminal pada folder proyek:
-```powershell
-cd C:\Users\idal\sekolajh\eco-hub
-```
-2. Jalankan server lokal:
+1. Jalankan server lokal dari root proyek:
 ```powershell
 python -m http.server 8080
 ```
-3. Buka browser:
+2. Buka browser:
 - `http://localhost:8080`
